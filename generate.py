@@ -102,7 +102,6 @@ def generate_file(current_time):
 </html>
     """.format(**generate_properties(current_time, get_random_generator(current_time)))
 
-generate_file(0)
 if __name__ == '__main__':
     elapsed_time = 0
     last_time = now()
