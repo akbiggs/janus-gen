@@ -65,11 +65,8 @@ def _make_tag_function(tag, has_body, description, prop_docs):
     fn.__doc__ = _gen_docstring(description, prop_docs)
     return fn
 
-def _extend(s1, s2, sep=''):
-    return s1 + sep + s2
-
 def chain(*tags):
-    return reduce(lambda x,y: _extend(x, y, '\n'), tags)
+    return reduce(lambda x,y: x + '\n' + y, tags)
 
 text = _make_tag_function("Text", True, "The Text tag allows the addition of 3D text to the room.", """
 pos (default "0 0 0") - specify the position (anchor point is centered horizontally, and at the bottom vertically)
