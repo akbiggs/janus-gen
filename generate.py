@@ -10,7 +10,7 @@ def find_filenames(glob_string, extension):
                       glob.glob(glob_string)))
 
 def find_assets(*extensions):
-    return reduce(lambda x,y: x+y, (find_filenames("./assets/*" + ext, ext) for ext in extensions))
+    return reduce(lambda x,y: x+y, (find_filenames("./janus_gen/assets/*" + ext, ext) for ext in extensions))
 
 
 def generate_asset_tags():
@@ -37,7 +37,9 @@ def generate_asset_tags():
 
     return tags
 
-generators = find_filenames("./generators/*.py", ".py")
+generators = find_filenames("./janus_gen/generators/*.py", ".py")
+generators.remove('__init__')
+
 default_room_properties = {
     'base': 'room2',
     'assets': generate_asset_tags(),
@@ -63,7 +65,7 @@ def now():
 
 def get_random_generator(current_time):
     gen_name = random.choice(generators)
-    return importlib.import_module('generators.' + gen_name)
+    return importlib.import_module('janus_gen.generators.' + gen_name)
 
 def generate_color(current_time):
     phase = 360
