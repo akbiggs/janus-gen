@@ -6,26 +6,35 @@ import re
 
 def find_filenames(glob_string, extension):
     return list(map(lambda s: re.split('/', s.replace('\\', '/')
-                                         .replace(extension, ''))[-1],
-                      glob.glob(glob_string)))
+                                             .replace(extension, ''))[-1],
+                    glob.glob(glob_string)))
 
 def find_assets(*extensions):
     return reduce(lambda x,y: x+y, (find_filenames("./janus_gen/assets/*" + ext, ext) for ext in extensions))
 
+assets = {
+    'sounds': [],
+    'images': [],
+    'objects': []
+}
 
 def generate_asset_tags():
     tags = ""
 
     sound_assets = find_assets(".mp3")
+    assets['sounds'] = list(map(lambda x: x + "_sound", sound_assets))
     for asset in sound_assets:
         tags += "<AssetSound id='{0}_sound' src='{0}.mp3 />\n".format(asset)
 
     image_assets = find_assets(".png")
+    assets['images'] = list(map(lambda x: x + "_img", image_assets))
     for asset in image_assets:
         tags += "<AssetImage id='{0}_img' src='{0}.png' />\n".format(asset)
 
     material_assets = find_assets(".mtl")
     object_assets = find_assets(".obj")
+    assets['objects'] = object_assets
+
     for asset in object_assets:
         tags += "<AssetObject id='{0}' src='{0}.obj' ".format(asset)
         if asset in material_assets:
@@ -76,11 +85,10 @@ def generate_color(current_time):
 
 def generate_properties(current_time, generator):
     generated_properties = {}
-    generated_assets = ""
     if hasattr(generator, 'generate_properties'):
         generated_properties = generator.generate_properties(current_time)
 
-    generated_properties['contents'] = generator.generate_content(current_time)
+    generated_properties['contents'] = generator.generate_content(assets, current_time)
     return merge(merge(default_room_properties, {'color': generate_color(current_time)}),
                  generated_properties)
 
