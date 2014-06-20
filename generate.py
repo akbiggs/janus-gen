@@ -1,8 +1,14 @@
 import time
 import random
+import functools
 import glob
 import importlib
 import re
+import os
+
+path = "./janus_gen/"
+if os.getcwd().endswith('janus_gen'):
+    path = "./"
 
 def find_filenames(glob_string, extension):
     return list(map(lambda s: re.split('/', s.replace('\\', '/')
@@ -10,7 +16,7 @@ def find_filenames(glob_string, extension):
                     glob.glob(glob_string)))
 
 def find_assets(*extensions):
-    return reduce(lambda x,y: x+y, (find_filenames("./janus_gen/assets/*" + ext, ext) for ext in extensions))
+    return functools.reduce(lambda x,y: x+y, (find_filenames("{0}assets/*{1}".format(path, ext), ext) for ext in extensions))
 
 assets = {
     'sounds': [],
@@ -24,19 +30,19 @@ def generate_asset_tags():
     sound_assets = find_assets(".mp3")
     assets['sounds'] = list(map(lambda x: x + "_sound", sound_assets))
     for asset in sound_assets:
-        tags += "<AssetSound id='{0}_sound' src='{0}.mp3 />\n".format(asset)
+        tags += "<AssetSound id='{0}_sound' src='assets/{0}.mp3 />\n".format(asset)
 
     image_assets = find_assets(".png")
     assets['images'] = list(map(lambda x: x + "_img", image_assets))
     for asset in image_assets:
-        tags += "<AssetImage id='{0}_img' src='{0}.png' />\n".format(asset)
+        tags += "<AssetImage id='{0}_img' src='assets/{0}.png' />\n".format(asset)
 
     material_assets = find_assets(".mtl")
     object_assets = find_assets(".obj")
     assets['objects'] = object_assets
 
     for asset in object_assets:
-        tags += "<AssetObject id='{0}' src='{0}.obj' ".format(asset)
+        tags += "<AssetObject id='{0}' src='assets/{0}.obj' ".format(asset)
         if asset in material_assets:
             tags += "mtl='{0}.mat'".format(asset)
         elif asset in image_assets:
@@ -46,7 +52,7 @@ def generate_asset_tags():
 
     return tags
 
-generators = find_filenames("./janus_gen/generators/*.py", ".py")
+generators = find_filenames("{0}generators/*.py".format(path), ".py")
 generators.remove('__init__')
 
 default_room_properties = {
@@ -74,7 +80,7 @@ def now():
 
 def get_random_generator(current_time):
     gen_name = random.choice(generators)
-    return importlib.import_module('janus_gen.generators.' + gen_name)
+    return importlib.import_module('generators.' + gen_name)
 
 def generate_color(current_time):
     phase = 360

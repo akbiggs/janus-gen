@@ -1,3 +1,5 @@
+import functools
+
 def _get_supported_properties(prop_docs):
     props = prop_docs.split('\n')
     supported = [x.split(' ')[0] for x in props if x != '']
@@ -25,7 +27,7 @@ def _inline_props(props):
         return ""
 
     inlined = ""
-    for tag, value in props.iteritems():
+    for tag, value in props.items():
         inlined += "{0}='{1}' ".format(tag, value)
     return inlined
 
@@ -66,7 +68,7 @@ def _make_tag_function(tag, has_body, description, prop_docs):
     return fn
 
 def chain(*tags):
-    return reduce(lambda x,y: x + '\n' + y, tags)
+    return functools.reduce(lambda x,y: x + '\n' + y, tags)
 
 text = _make_tag_function("Text", True, "The Text tag allows the addition of 3D text to the room.", """
 pos (default "0 0 0") - specify the position (anchor point is centered horizontally, and at the bottom vertically)
